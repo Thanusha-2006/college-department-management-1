@@ -1,0 +1,111 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_DEPARTMENTS 5
+#define MAX_NAME_LEN 50
+
+// Faculty linked list node
+typedef struct Faculty {
+    char name[MAX_NAME_LEN];
+    struct Faculty* next;
+} Faculty;
+
+// Department structure
+typedef struct {
+    char deptName[MAX_NAME_LEN];
+    Faculty* facultyHead;
+} Department;
+
+// Function Prototypes
+void addFaculty(Department departments[], int deptCount);
+void displayDepartments(Department departments[], int deptCount);
+void freeMemory(Department departments[], int deptCount);
+
+int main() {
+    Department departments[MAX_DEPARTMENTS] = {
+        {"CSE", NULL},
+        {"ECE", NULL},
+        {"MECH", NULL},
+        {"CIVIL", NULL},
+        {"EEE", NULL}
+    };
+
+    int choice;
+    while (1) {
+        printf("\nCollege Department Management\n");
+        printf("1. Add Faculty\n");
+        printf("2. Display Departments and Faculty\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                addFaculty(departments, MAX_DEPARTMENTS);
+                break;
+            case 2:
+                displayDepartments(departments, MAX_DEPARTMENTS);
+                break;
+            case 3:
+                freeMemory(departments, MAX_DEPARTMENTS);
+                printf("Exiting...\n");
+                return 0;
+            default:
+                printf("Invalid choice.\n");
+        }
+    }
+}
+
+void addFaculty(Department departments[], int deptCount) {
+    int deptIndex;
+    char name[MAX_NAME_LEN];
+
+    printf("Available Departments:\n");
+    for (int i = 0; i < deptCount; i++) {
+        printf("%d. %s\n", i + 1, departments[i].deptName);
+    }
+
+    printf("Choose department (1-%d): ", deptCount);
+    scanf("%d", &deptIndex);
+
+    if (deptIndex < 1 || deptIndex > deptCount) {
+        printf("Invalid department selection.\n");
+        return;
+    }
+
+    printf("Enter faculty name: ");
+    scanf("%s", name);
+
+    Faculty* newFaculty = (Faculty*)malloc(sizeof(Faculty));
+    strcpy(newFaculty->name, name);
+    newFaculty->next = departments[deptIndex - 1].facultyHead;
+    departments[deptIndex - 1].facultyHead = newFaculty;
+
+    printf("Faculty %s added to %s department.\n", name, departments[deptIndex - 1].deptName);
+}
+
+void displayDepartments(Department departments[], int deptCount) {
+    for (int i = 0; i < deptCount; i++) {
+        printf("\nDepartment: %s\n", departments[i].deptName);
+        Faculty* current = departments[i].facultyHead;
+        if (!current) {
+            printf("  No faculty members.\n");
+        }
+        while (current) {
+            printf("  - %s\n", current->name);
+            current = current->next;
+        }
+    }
+}
+
+void freeMemory(Department departments[], int deptCount) {
+    for (int i = 0; i < deptCount; i++) {
+        Faculty* current = departments[i].facultyHead;
+        while (current) {
+            Faculty* temp = current;
+            current = current->next;
+            free(temp);
+        }
+    }
+}
+
